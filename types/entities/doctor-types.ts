@@ -2,7 +2,7 @@ import { createDoctorBody, updateDoctorBody } from "@/lib/validations/doctor.sch
 import { Doctor } from "@prisma/client";
 import { z } from "zod";
 
-export type DoctorType = Doctor & { 
+export type DoctorDetails = Doctor & { 
   user: { 
     id: string; 
     firstName: string; 

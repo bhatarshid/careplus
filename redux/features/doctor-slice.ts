@@ -1,68 +1,58 @@
-import { fetchDoctorsAPI } from "@/lib/actions/doctor.actions";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { fetchDoctorDetailsAPI } from '@/lib/actions/doctor.actions';
+import { DoctorDetails } from '@/types/entities';
 
 interface DoctorState {
-  doctors: any[] | null;
-  isError: boolean;
-  isSuccess: boolean;
+  doctor: DoctorDetails | null;
   isLoading: boolean;
-  message: string;
+  isError: boolean;
+  error: string | null;
 }
 
 const initialState: DoctorState = {
-  doctors: null,
-  isError: false,
-  isSuccess: false,
+  doctor: null,
   isLoading: false,
-  message: ''
-}
+  isError: false,
+  error: null,
+};
 
-export const fetchDoctors = createAsyncThunk('doctor/all', 
-  async (_, thunkApi) => {
-    try {
-      const response: any = await fetchDoctorsAPI();
-      return response;
-    }
-    catch (error: any) {
-      const message = error.response.data.error || 'Internal server error';
-      return thunkApi.rejectWithValue(message);
-    }
+export const fetchDoctorDetails = createAsyncThunk(
+  'doctor/fetchDoctorDetails',
+  async (doctorId: string) => {
+    const response = await fetchDoctorDetailsAPI(doctorId);
+    return response.data.doctor;
   }
-)
+);
 
-export const doctorSlice = createSlice({
+const doctorSlice = createSlice({
   name: 'doctor',
   initialState,
   reducers: {
     reset: (state) => {
-      state.isLoading = false
-      state.isSuccess = false
-      state.isError = false
-      state.message = ''
-      state.doctors = null
-    }
+      state.doctor = null;
+      state.isLoading = false;
+      state.isError = false;
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
-     .addCase(fetchDoctors.pending, (state) => {
+      .addCase(fetchDoctorDetails.pending, (state) => {
         state.isLoading = true;
-        state.message = '';
-      })
-     .addCase(fetchDoctors.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.isSuccess = true;
         state.isError = false;
-        state.message = '';
-        state.doctors = (action.payload.data.doctors);
+        state.error = null;
       })
-     .addCase(fetchDoctors.rejected, (state, action) => {
+      .addCase(fetchDoctorDetails.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.doctor = action.payload;
+      })
+      .addCase(fetchDoctorDetails.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
-        state.isSuccess = false;
-        state.message = action.payload as string;
-      })
-  }
-})
+        state.error = action.error.message || 'Failed to fetch doctor details';
+      });
+  },
+});
 
-export const { reset } = doctorSlice.actions
-export default doctorSlice.reducer
+export const { reset } = doctorSlice.actions;
+export default doctorSlice.reducer;

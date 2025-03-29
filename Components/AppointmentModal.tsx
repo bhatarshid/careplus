@@ -25,7 +25,7 @@ import { ServiceDoctorDetails } from "@/types/entities/service-types";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { toast } from "react-toastify";
-import { bookAppointment } from "@/redux/features/appointment-slice";
+import { bookAppointment, reset } from "@/redux/features/appointment-slice";
 // import { bookAppointment, reset } from "@/redux/features/service-slice";
 
 export const AppointmentModal = ({
@@ -40,7 +40,6 @@ export const AppointmentModal = ({
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [availableTimeSlots, setAvailableTimeSlots] = useState<any>([]);
   const [formInitialized, setFormInitialized] = useState(false);
-  const { isError, isSuccess, isLoading } = useSelector((state: RootState) => state.service);
   const { isError: appointmentError, isSuccess: appointmentSuccess, isLoading: appointmentLoading } = useSelector((state: RootState) => state.appointment);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -74,7 +73,7 @@ export const AppointmentModal = ({
 
     if(appointmentSuccess) {
       toast.success("Appointment booked successfully")
-      // dispatch(reset())
+      dispatch(reset())
       onClose()
     }
 

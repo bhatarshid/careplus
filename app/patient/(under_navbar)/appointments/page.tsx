@@ -1,17 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Avatar, AvatarImage, AvatarFallback } from "@/Components/ui/avatar"
-import { Badge } from "@/Components/ui/badge"
-import { Button } from "@/Components/ui/button"
 import { Input } from "@/Components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/Components/ui/tabs"
-import { Calendar, Clock, Search } from "lucide-react"
+import { Search } from "lucide-react"
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
 import { fetchAllAppointments, reset } from '@/redux/features/appointment-slice';
 import { AppointmentDetails } from '@/types/entities/service-types';
 import AppointmentDetailsModal from "./AppointmentDetailsModal"
+import { AppointmentCard } from "@/Components/appointments/AppointmentCard";
+import { Badge } from "@/Components/ui/badge"
 
 // Format date for display
 const formatAppointmentDate = (date: Date) => {
@@ -148,143 +147,23 @@ export default function AppointmentsPage() {
         </Tabs>
       </div>
 
-      {/* Pending Appointments Section */}
-      {filteredAppointments.some((a) => a.status === "PENDING") && (
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 bg-gray-600 text-white p-3 rounded-md">Pending Appointments</h2>
-          <div className="grid gap-4">
-            {filteredAppointments
-              .filter((appointment) => appointment.status === "PENDING")
-              .map((appointment) => (
-                <div key={appointment.id} className="bg-white rounded-lg shadow-md p-4 border-l-4 border-blue-500">
-                  <div className="flex flex-col md:flex-row justify-between">
-                    <div className="flex items-center gap-4 mb-4 md:mb-0">
-                      <Avatar className="h-12 w-12 border-2 border-gray-200">
-                        <AvatarImage
-                          src={appointment.doctorPicture ? URL.createObjectURL(new Blob([appointment.doctorPicture])) : undefined}
-                          alt={`${appointment.doctorFirstName} ${appointment.doctorLastName}`}
-                          className="h-full w-full object-cover"
-                        />
-                        <AvatarFallback className="bg-blue-100 text-blue-600 text-sm font-medium">
-                          {appointment.doctorFirstName[0]}{appointment.doctorLastName[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-semibold">{`${appointment.doctorFirstName} ${appointment.doctorLastName}`}</h3>
-                        <p className="text-sm text-gray-600">{appointment.doctorSpecialization}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col md:flex-row md:items-center gap-4">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium">{appointment.serviceName}</span>
-                        <div className="flex items-center gap-1 text-gray-500 text-sm">
-                          <Calendar className="h-3 w-3" />
-                          <span>{formatAppointmentDate(new Date(appointment.appointmentDate))}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-gray-500 text-sm">
-                          <Clock className="h-3 w-3" />
-                          <span>{formatAppointmentTime(new Date(appointment.appointmentDate))}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-2 md:items-end">
-                        <StatusBadge status={appointment.status} />
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-blue-600 border-blue-600 hover:bg-blue-50"
-                          onClick={() => setSelectedAppointment(appointment)}
-                        >
-                          View Details
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      )}
-
-      {/* Completed and Cancelled Appointments Section */}
-      {filteredAppointments.some((a) => a.status === "COMPLETED" || a.status === "CANCELLED") && (
-        <div>
-          <h2 className="text-xl font-semibold mb-4 bg-gray-600 text-white p-3 rounded-md">Past Appointments</h2>
-          <div className="grid gap-4">
-            {filteredAppointments
-              .filter((appointment) => appointment.status === "COMPLETED" || appointment.status === "CANCELLED")
-              .map((appointment) => (
-                <div
-                  key={appointment.id}
-                  className={`bg-white rounded-lg shadow-md p-4 border-l-4 ${
-                    appointment.status === "COMPLETED" ? "border-green-500" : "border-red-500"
-                  }`}
-                >
-                  <div className="flex flex-col md:flex-row justify-between">
-                    <div className="flex items-center gap-4 mb-4 md:mb-0">
-                      <Avatar className="h-12 w-12 border-2 border-gray-200">
-                        <AvatarImage
-                          src={appointment.doctorPicture ? URL.createObjectURL(new Blob([appointment.doctorPicture])) : undefined}
-                          alt={`${appointment.doctorFirstName} ${appointment.doctorLastName}`}
-                          className="h-full w-full object-cover"
-                        />
-                        <AvatarFallback className="bg-blue-100 text-blue-600 text-sm font-medium">
-                          {appointment.doctorFirstName[0]}{appointment.doctorLastName[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-semibold">{`${appointment.doctorFirstName} ${appointment.doctorLastName}`}</h3>
-                        <p className="text-sm text-gray-600">{appointment.doctorSpecialization}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col md:flex-row md:items-center gap-4">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium">{appointment.serviceName}</span>
-                        <div className="flex items-center gap-1 text-gray-500 text-sm">
-                          <Calendar className="h-3 w-3" />
-                          <span>{formatAppointmentDate(new Date(appointment.appointmentDate))}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-gray-500 text-sm">
-                          <Clock className="h-3 w-3" />
-                          <span>{formatAppointmentTime(new Date(appointment.appointmentDate))}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-2 md:items-end">
-                        <StatusBadge status={appointment.status} />
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="text-gray-600 border-gray-600 hover:bg-gray-50"
-                          onClick={() => setSelectedAppointment(appointment)}
-                        >
-                          View Details
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      )}
+      {/* Appointments Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {filteredAppointments.map((appointment) => (
+          <AppointmentCard
+            key={appointment.id}
+            appointment={appointment}
+            onViewDetails={setSelectedAppointment}
+            variant="full"
+          />
+        ))}
+      </div>
 
       {/* Empty state */}
       {filteredAppointments.length === 0 && (
         <div className="bg-gray-50 rounded-lg p-8 text-center">
           <h3 className="text-lg font-medium mb-2">No appointments found</h3>
-          <p className="text-gray-500 mb-4">Try adjusting your search or filter criteria</p>
-          <Button
-            onClick={() => {
-              setSearchTerm("")
-              setActiveTab("all")
-            }}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            Clear Filters
-          </Button>
+          <p className="text-gray-500">Try adjusting your search or filter criteria</p>
         </div>
       )}
 

@@ -1,6 +1,6 @@
 import AppError, { handleErrorNextResponse } from "@/lib/App-Error";
 import { fetchAllDoctors, fetchDoctorById } from "@/services/doctor-service";
-import { DoctorType } from "@/types/entities/doctor-types";
+import { DoctorDetails } from "@/types/entities/doctor-types";
 
 import { NextRequest, NextResponse } from "next/server";
 
@@ -24,7 +24,7 @@ export async function getDoctorById(request: NextRequest) {
       throw new AppError('Provide Id of doctor', 400);
     }
 
-    const doctor: DoctorType | null = await fetchDoctorById(id);
+    const doctor: DoctorDetails | null = await fetchDoctorById(id);
 
     return NextResponse.json({ doctor }, { status: 200 });
   }

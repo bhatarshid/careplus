@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Calendar, Clock, Medal, Phone, DollarSign, Star, ChevronsDown, ChevronsRight } from "lucide-react"
 import { Button } from "@/Components/ui/button"
 import { formatDate, formatTimeSlot, getImageSrc } from "@/lib/utils"
+import { useRouter } from "next/navigation"
 
 interface DoctorCardProps {
   doctor: any
@@ -12,6 +13,11 @@ interface DoctorCardProps {
 
 export function DoctorCard({ doctor, onBookNow }: DoctorCardProps) {
   const [expandedDate, setExpandedDate] = useState(null)
+  const router = useRouter()
+
+  const handleViewProfile = () => {
+    router.push(`/patient/doctors/${doctor.doctorId}`)
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -98,7 +104,7 @@ export function DoctorCard({ doctor, onBookNow }: DoctorCardProps) {
           >
             Book Now
           </Button>
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" onClick={handleViewProfile}>
             View Profile
           </Button>
         </div>
